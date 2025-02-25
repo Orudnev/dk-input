@@ -1,7 +1,7 @@
 {
   "name": "dk-input",
   "version": "0.1.0",
-  "homepage": "https://orudnev.github.io/dk-input",
+  "homepage": "https://orudnev.github.io/dk-input/",
   "private": true,
   "dependencies": {
     "@speechly/speech-recognition-polyfill": "^1.3.0",
