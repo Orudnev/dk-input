@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/dk-input/static/js/main.3cc489a9.js",
+    "main.js": "/dk-input/static/js/main.bfe7b88e.js",
     "index.html": "/dk-input/index.html",
-    "main.3cc489a9.js.map": "/dk-input/static/js/main.3cc489a9.js.map"
+    "main.bfe7b88e.js.map": "/dk-input/static/js/main.bfe7b88e.js.map"
   },
   "entrypoints": [
-    "static/js/main.3cc489a9.js"
+    "static/js/main.bfe7b88e.js"
   ]
 }
