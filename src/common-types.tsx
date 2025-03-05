@@ -1,6 +1,8 @@
 export enum TableNameEnum{
     JCommon = "JCommon",
-    BnBish = "BnBish"
+    BnBish = "BnBish",
+    Dest = "Dest",
+    DCItems = "DCItems"
 }
 
 export interface IJCommonRow{
@@ -14,6 +16,12 @@ export interface IJCommonRow{
     Sign:number,
     AddRowTime:Date,
     Status:number
+}
+
+export interface IDCItems{
+    Name:string;
+    Sign:number;
+    Dest:string;
 }
 
 export interface IApiResponse{
