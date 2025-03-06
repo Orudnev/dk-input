@@ -5,6 +5,14 @@ export enum TableNameEnum{
     DCItems = "DCItems"
 }
 
+export enum StatusEnum{
+    New = -1,
+    NotProcessed = 0,
+    InProcess = 1,
+    Processed = 2,
+    Lookup = 3
+}
+
 export interface IJCommonRow{
     Id:string;
     DestTable:TableNameEnum;

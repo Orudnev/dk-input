@@ -1,8 +1,7 @@
 import axios from "axios";
 import { TableNameEnum } from "./common-types";
 
-const webApiBaseUrl = 'https://script.google.com/macros/s/AKfycbyQZ89bA0DqXNqbCA1284iBwxgUzGwh4S5-0IPpPJ8spAUrgMTw_H0W361KtcOg_G4DEg/exec';
-
+const webApiBaseUrl = 'https://script.google.com/macros/s/AKfycbwru_j1Gj39A86-fnjJIXzsgEGd8QCZd-epJRMH9JhlJZp1rEcah3OPhkbVWng_AsoyZw/exec';
 
 
 export function GetAllRows(tableName:TableNameEnum):Promise<any>{
@@ -11,6 +10,24 @@ export function GetAllRows(tableName:TableNameEnum):Promise<any>{
         method:'GET',
         params:{method:"getAllRows",table:tableName}
     });
+}
+
+export function AddOrUpdateRow(tableName:TableNameEnum):Promise<any>{
+    return axios({
+        url:webApiBaseUrl,
+        method:'GET',
+        params:{method:"getAllRows",table:tableName}
+    });
+}
+
+export function GeneratePseudoUniqueId(){
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const timestamp = Date.now().toString(36).toUpperCase().slice(-4); // Берем последние 4 символа от числа в 36-ричной системе
+    const randomPart = Array.from({ length: 4 }, () =>
+        chars[Math.floor(Math.random() * chars.length)]
+    ).join("");
+
+    return timestamp + randomPart;
 }
 
 
