@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { IJCommonRow, StatusEnum } from '../../common-types';
-import { GridRowModesModel,  GridRenderCellParams } from "@mui/x-data-grid";
-
-declare module '@mui/x-data-grid' {
-    interface ToolbarPropsOverrides {
-        setRows: (newRows: (oldRows: IJCommonRow[]) => IJCommonRow[]) => void;
-        setRowModesModel: (
-            newModel: (oldModel: GridRowModesModel) => GridRowModesModel,
-        ) => void;
-    }
-}
+import { StatusEnum } from '../../common-types';
+import { GridRenderCellParams } from "@mui/x-data-grid";
 
 
 export const RenderByStatus = (params: GridRenderCellParams<any, any, any>) => {
