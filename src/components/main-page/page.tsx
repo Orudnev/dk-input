@@ -12,6 +12,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { Button } from '@mui/material';
 import { RenderByStatus } from './renderers';
 import { EditToolbar, WaitIcon } from './toolbar';
+import { styled } from '@mui/material/styles';
 
 export function MainPage() {
   const [Rows, setRows] = useState<IJCommonRow[]>([]);
@@ -186,7 +187,7 @@ export function MainPage() {
         rowModesModel={rowModesModel}
         rowHeight={25}
         processRowUpdate={processRowUpdate}
-        slots={{ toolbar: EditToolbar }}
+        slots={{ toolbar: EditToolbar,noRowsOverlay:WaitLoadingRows }}
         slotProps={{ toolbar: { setRows: setRows, setRowModesModel, isSelectRowsMode, setIsSelectRowsMode, rowSelectionModel, setRowSelectionModel, handleToolbarCmd } }}
         checkboxSelection={isSelectRowsMode}
         onRowSelectionModelChange={(newRowSelectionModel) => {
@@ -197,4 +198,32 @@ export function MainPage() {
     </div>
   );
 
+}
+
+
+const StyledGridOverlay = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '100%',
+  '& .no-rows-primary': {
+    fill: '#3D4751',
+    ...theme.applyStyles('light', {
+      fill: '#AEB8C2',
+    }),
+  },
+  '& .no-rows-secondary': {
+    fill: '#1D2126',
+    ...theme.applyStyles('light', {
+      fill: '#E8EAED',
+    }),
+  },
+}));
+function WaitLoadingRows(){
+  return (
+    <StyledGridOverlay>
+      <WaitIcon />
+    </StyledGridOverlay>
+  );
 }
