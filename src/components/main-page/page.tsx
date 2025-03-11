@@ -16,6 +16,7 @@ import { styled } from '@mui/material/styles';
 
 export function MainPage() {
   const [Rows, setRows] = useState<IJCommonRow[]>([]);
+  const [IsLoading, setIsLoading] = useState<boolean>(false);
   const [LookupRows, setLookuprows] = useState<IJCommonRow[]>([]);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>([]);
@@ -24,11 +25,13 @@ export function MainPage() {
   const [waitSave, setWaitSave] = useState<string[]>([]);
   const [isSelectRowsMode, setIsSelectRowsMode] = useState<boolean>(false);
   const loadRows = () => {
+    setIsLoading(true);
     GetAllRows(TableNameEnum.JCommon)
       .then((resp: any) => {
         return resp.data;
       })
       .then((data: IApiResponse) => {
+        setIsLoading(false);
         data.invokeMethodResult.forEach((row: IJCommonRow) => {
           row.Date = new Date(row.Date);
         });
@@ -45,6 +48,7 @@ export function MainPage() {
     loadRows();
     GetAllRows(TableNameEnum.Dest)
       .then((resp: any) => {
+        setIsLoading(false);
         setDestOptions(resp.data.invokeMethodResult);
       });
     GetAllRows(TableNameEnum.DCItems)
@@ -93,22 +97,22 @@ export function MainPage() {
   };
 
   const handleToolbarCmd = (cmd: string) => {
-    let selectedRows:string[] = rowSelectionModel.map(itm => itm.toString());
+    let selectedRows: string[] = rowSelectionModel.map(itm => itm.toString());
     switch (cmd) {
       case "Delete":
         DeleteRows(TableNameEnum.JCommon, selectedRows)
-        .then((resp: any) => {
-          loadRows();
-        });
+          .then((resp: any) => {
+            loadRows();
+          });
         setRows([]);
         break;
       case "ToLookup":
-        let requestList:Promise<any>[] = [];
+        let requestList: Promise<any>[] = [];
         selectedRows.forEach((rowId) => {
           let crow = Rows.find((row) => row.Id === rowId);
-          if(crow){
+          if (crow) {
             crow.Status = StatusEnum.Lookup;
-            requestList.push(AddOrUpdateRow(TableNameEnum.JCommon, crow));  
+            requestList.push(AddOrUpdateRow(TableNameEnum.JCommon, crow));
           }
         });
         Promise.all(requestList).then((resp: any) => {
@@ -177,7 +181,12 @@ export function MainPage() {
     },
     { field: "Sum", headerName: "Sum", width: 100, type: "number", renderCell: RenderByStatus, editable: true }
   ];
-
+  let noRowsComponent: any;
+  if(IsLoading) {
+    noRowsComponent = WaitLoadingRows;
+  } else {
+    noRowsComponent = NoRows;
+  }
   return (
     <div>
       <DataGrid getRowId={(row) => row.Id}
@@ -187,7 +196,7 @@ export function MainPage() {
         rowModesModel={rowModesModel}
         rowHeight={25}
         processRowUpdate={processRowUpdate}
-        slots={{ toolbar: EditToolbar,noRowsOverlay:WaitLoadingRows }}
+        slots={{ toolbar: EditToolbar, noRowsOverlay: noRowsComponent }}
         slotProps={{ toolbar: { setRows: setRows, setRowModesModel, isSelectRowsMode, setIsSelectRowsMode, rowSelectionModel, setRowSelectionModel, handleToolbarCmd } }}
         checkboxSelection={isSelectRowsMode}
         onRowSelectionModelChange={(newRowSelectionModel) => {
@@ -220,10 +229,19 @@ const StyledGridOverlay = styled('div')(({ theme }) => ({
     }),
   },
 }));
-function WaitLoadingRows(){
+function WaitLoadingRows() {
   return (
     <StyledGridOverlay>
       <WaitIcon />
+      <div>Loading...</div>
+    </StyledGridOverlay>
+  );
+}
+
+function NoRows() {
+  return (
+    <StyledGridOverlay>
+      <div>No Rows</div>
     </StyledGridOverlay>
   );
 }
