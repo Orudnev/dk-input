@@ -13,7 +13,14 @@ import { Button } from '@mui/material';
 import { RenderByStatus } from './renderers';
 import { EditToolbar, WaitIcon } from './toolbar';
 import { styled } from '@mui/material/styles';
+import { SmartAddForm } from './smart-add-form';
 
+
+export enum MainPageMode {
+  Regular,
+  SelectRows,
+  SmartAddRow
+}
 export function MainPage() {
   const [Rows, setRows] = useState<IJCommonRow[]>([]);
   const [IsLoading, setIsLoading] = useState<boolean>(false);
@@ -23,7 +30,7 @@ export function MainPage() {
   const [DestOptions, setDestOptions] = useState<any[]>([{ Name: "Loading..." }]);
   const [DCItemOptions, setDCItemOptions] = useState<IDCItems[]>([{ Name: "Loading...", Dest: "", Sign: 0 }]);
   const [waitSave, setWaitSave] = useState<string[]>([]);
-  const [isSelectRowsMode, setIsSelectRowsMode] = useState<boolean>(false);
+  const [mainPageMode, setMainPageMode] = useState<MainPageMode>(MainPageMode.Regular);
   const loadRows = () => {
     setIsLoading(true);
     GetAllRows(TableNameEnum.JCommon)
@@ -119,7 +126,16 @@ export function MainPage() {
           setRows([]);
           loadRows();
         });
-        break
+        break;
+      case "SmartAdd":
+        setMainPageMode(MainPageMode.SmartAddRow);
+        break;
+      case "Cancel":
+        setMainPageMode(MainPageMode.Regular);
+        break;
+      case "Save":
+        setMainPageMode(MainPageMode.Regular);
+        break;
     }
   };
 
@@ -182,10 +198,19 @@ export function MainPage() {
     { field: "Sum", headerName: "Sum", width: 100, type: "number", renderCell: RenderByStatus, editable: true }
   ];
   let noRowsComponent: any;
-  if(IsLoading) {
+  if (IsLoading) {
     noRowsComponent = WaitLoadingRows;
   } else {
     noRowsComponent = NoRows;
+  }
+  if(mainPageMode === MainPageMode.SmartAddRow){
+    let tprops = { setRows: setRows, setRowModesModel, mainPageMode, setMainPageMode, rowSelectionModel, setRowSelectionModel, handleToolbarCmd };
+    return(
+      <div>
+        <EditToolbar {...tprops} />
+        <SmartAddForm lookupRows={LookupRows} handleSubmit={(row)=>{}} />
+      </div>
+    );
   }
   return (
     <div>
@@ -197,8 +222,8 @@ export function MainPage() {
         rowHeight={25}
         processRowUpdate={processRowUpdate}
         slots={{ toolbar: EditToolbar, noRowsOverlay: noRowsComponent }}
-        slotProps={{ toolbar: { setRows: setRows, setRowModesModel, isSelectRowsMode, setIsSelectRowsMode, rowSelectionModel, setRowSelectionModel, handleToolbarCmd } }}
-        checkboxSelection={isSelectRowsMode}
+        slotProps={{ toolbar: { setRows: setRows, setRowModesModel, mainPageMode, setMainPageMode, rowSelectionModel, setRowSelectionModel, handleToolbarCmd } }}
+        checkboxSelection={mainPageMode === MainPageMode.SelectRows}
         onRowSelectionModelChange={(newRowSelectionModel) => {
           setRowSelectionModel(newRowSelectionModel);
         }}

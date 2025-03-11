@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { GridRowModes, GridRowSelectionModel, GridSlotProps, GridToolbarContainer } from "@mui/x-data-grid";
 import AddIcon from '@mui/icons-material/Add';
-import { CheckBoxOutlineBlankOutlined, CheckBoxOutlined, DeleteOutlineOutlined, DnsTwoTone } from '@mui/icons-material';
+import { CheckBoxOutlineBlankOutlined, CheckBoxOutlined, DeleteOutlineOutlined, DnsTwoTone, CancelTwoTone, SaveTwoTone } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { GeneratePseudoUniqueId } from '../../web-api-wrapper';
 import { GridRowModesModel, GridRenderCellParams } from "@mui/x-data-grid";
 import { IJCommonRow, StatusEnum } from '../../common-types';
+import { MainPageMode } from './page';
 
 export function EditToolbar(props: GridSlotProps['toolbar']) {
   const { setRows, setRowModesModel } = props;
@@ -24,33 +25,36 @@ export function EditToolbar(props: GridSlotProps['toolbar']) {
   const handleSelectClick = (newValue: boolean) => {
     if (newValue === false) {
       props.setRowSelectionModel([]);
+      props.setMainPageMode(MainPageMode.Regular);
+    } else {
+      props.setMainPageMode(MainPageMode.SelectRows);
     }
-    props.setIsSelectRowsMode(newValue);
   };
+
+  const addBtn = props.mainPageMode === MainPageMode.Regular && <Button color="primary" startIcon={<AddIcon />} onClick={handleAddClick}>Add</Button>;
+  const addSmartBtn = props.mainPageMode === MainPageMode.Regular && <Button color="primary" startIcon={<AddIcon />} onClick={() => props.handleToolbarCmd("SmartAdd")}>Smart Add</Button>;
+  const selectBtn = props.mainPageMode === MainPageMode.SelectRows 
+                    ?  <Button color="primary" startIcon={<CheckBoxOutlined />} onClick={() => handleSelectClick(false)}>
+                            Select
+                        </Button>
+                    :  props.mainPageMode === MainPageMode.Regular 
+                          ? <Button color="primary" startIcon={<CheckBoxOutlineBlankOutlined />} onClick={() => handleSelectClick(true)}>
+                              Select
+                            </Button>
+                          : null;
+  const deleteBtn = props.rowSelectionModel.length > 0 && <Button color="primary" startIcon={<DeleteOutlineOutlined />} onClick={() => props.handleToolbarCmd("Delete")}>Delete</Button>; 
+  const toLookupBtn = props.rowSelectionModel.length > 0 && <Button color="primary" startIcon={<DnsTwoTone />} onClick={() => props.handleToolbarCmd("ToLookup")}>To Lookup</Button>;
+  const cancelBtn = props.mainPageMode === MainPageMode.SmartAddRow && <Button color="primary" startIcon={<CancelTwoTone />} onClick={() => props.handleToolbarCmd("Cancel")}>Cancel</Button>;
+  const saveBtn = props.mainPageMode === MainPageMode.SmartAddRow && <Button color="primary" startIcon={<SaveTwoTone />} onClick={() => props.handleToolbarCmd("Save")}>Save</Button>;
   return (
     <GridToolbarContainer>
-      <Button color="primary" startIcon={<AddIcon />} onClick={handleAddClick}>
-        Add
-      </Button>
-      {props.isSelectRowsMode ?
-        <Button color="primary" startIcon={<CheckBoxOutlined />} onClick={() => handleSelectClick(false)}>
-          Select
-        </Button> :
-        <Button color="primary" startIcon={<CheckBoxOutlineBlankOutlined />} onClick={() => handleSelectClick(true)}>
-          Select
-        </Button>
-      }
-      {props.rowSelectionModel.length > 0 &&
-        <Button color="primary" startIcon={<DeleteOutlineOutlined />} onClick={() => props.handleToolbarCmd("Delete")}>
-          Delete
-        </Button>
-      }
-      {props.rowSelectionModel.length > 0 &&
-        <Button color="primary" startIcon={<DnsTwoTone />} onClick={() => props.handleToolbarCmd("ToLookup")}>
-          To Lookup
-        </Button>
-      }
-
+      {addBtn}      
+      {addSmartBtn}
+      {selectBtn}      
+      {deleteBtn}
+      {toLookupBtn}
+      {cancelBtn}
+      {saveBtn}
     </GridToolbarContainer>
   );
 }
@@ -61,8 +65,8 @@ declare module '@mui/x-data-grid' {
     setRowModesModel: (
       newModel: (oldModel: GridRowModesModel) => GridRowModesModel,
     ) => void;
-    isSelectRowsMode: boolean;
-    setIsSelectRowsMode: (value: boolean) => void;
+    mainPageMode: MainPageMode;
+    setMainPageMode: (value: MainPageMode) => void;
     rowSelectionModel: GridRowSelectionModel;
     setRowSelectionModel: (value: GridRowSelectionModel) => void;
     handleToolbarCmd: (cmd: string) => void;
