@@ -1,4 +1,5 @@
 export enum TableNameEnum{
+    None = "",
     JCommon = "JCommon",
     BnBish = "BnBish",
     Dest = "Dest",

@@ -44,8 +44,6 @@ export function EditToolbar(props: GridSlotProps['toolbar']) {
                           : null;
   const deleteBtn = props.rowSelectionModel.length > 0 && <Button color="primary" startIcon={<DeleteOutlineOutlined />} onClick={() => props.handleToolbarCmd("Delete")}>Delete</Button>; 
   const toLookupBtn = props.rowSelectionModel.length > 0 && <Button color="primary" startIcon={<DnsTwoTone />} onClick={() => props.handleToolbarCmd("ToLookup")}>To Lookup</Button>;
-  const cancelBtn = props.mainPageMode === MainPageMode.SmartAddRow && <Button color="primary" startIcon={<CancelTwoTone />} onClick={() => props.handleToolbarCmd("Cancel")}>Cancel</Button>;
-  const saveBtn = props.mainPageMode === MainPageMode.SmartAddRow && <Button color="primary" startIcon={<SaveTwoTone />} onClick={() => props.handleToolbarCmd("Save")}>Save</Button>;
   return (
     <GridToolbarContainer>
       {addBtn}      
@@ -53,8 +51,6 @@ export function EditToolbar(props: GridSlotProps['toolbar']) {
       {selectBtn}      
       {deleteBtn}
       {toLookupBtn}
-      {cancelBtn}
-      {saveBtn}
     </GridToolbarContainer>
   );
 }
@@ -76,8 +72,8 @@ declare module '@mui/x-data-grid' {
 export function WaitIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="24" cy="24" r="20" stroke="#4A90E2" strokeWidth="4" fill="none" stroke-linecap="round"
-        stroke-dasharray="126.92" stroke-dashoffset="0">
+      <circle cx="24" cy="24" r="20" stroke="#4A90E2" strokeWidth="4" fill="none" strokeLinecap="round"
+        strokeDasharray="126.92" strokeDashoffset="0">
         <animate attributeName="stroke-dashoffset" from="0" to="-126.92" dur="1s" repeatCount="indefinite" />
         <animate attributeName="stroke" values="#4A90E2;#50E3C2;#4A90E2" dur="2s" repeatCount="indefinite" />
       </circle>

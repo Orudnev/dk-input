@@ -130,12 +130,12 @@ export function MainPage() {
       case "SmartAdd":
         setMainPageMode(MainPageMode.SmartAddRow);
         break;
-      case "Cancel":
-        setMainPageMode(MainPageMode.Regular);
-        break;
-      case "Save":
-        setMainPageMode(MainPageMode.Regular);
-        break;
+      // case "Cancel":
+      //   setMainPageMode(MainPageMode.Regular);
+      //   break;
+      // case "Save":
+      //   setMainPageMode(MainPageMode.Regular);
+      //   break;
     }
   };
 
@@ -207,8 +207,24 @@ export function MainPage() {
     let tprops = { setRows: setRows, setRowModesModel, mainPageMode, setMainPageMode, rowSelectionModel, setRowSelectionModel, handleToolbarCmd };
     return(
       <div>
-        <EditToolbar {...tprops} />
-        <SmartAddForm lookupRows={LookupRows} handleSubmit={(row)=>{}} />
+        <SmartAddForm lookupRows={LookupRows} handleSubmit={(newRow)=>{
+          if(!newRow){
+            setMainPageMode(MainPageMode.Regular);
+            return;
+          }
+          const newRows = [...Rows];
+          newRows.push(newRow);
+          let newWaitSave = [...waitSave];
+          newWaitSave.push(newRow.Id);
+          setRows(newRows);
+          setWaitSave(newWaitSave);
+          AddOrUpdateRow(TableNameEnum.JCommon, newRow)
+          .then((resp: any) => {
+            let newWaitSave = waitSave.filter(itm => itm != newRow.Id);
+            setWaitSave(newWaitSave);
+          })
+          setMainPageMode(MainPageMode.Regular);
+        }} />
       </div>
     );
   }
