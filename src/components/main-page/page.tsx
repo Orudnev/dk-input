@@ -185,7 +185,7 @@ export function MainPage() {
         ];
       }
     },
-    { field: "DestTable", headerName: "Dest", width: 70, type: "singleSelect", valueOptions: ["BnBish", "BnSok", "BnMb", "Nal"], renderCell: RenderByStatus, editable: true },
+    { field: "DestTable", headerName: "DstTbl", width: 70, type: "singleSelect", valueOptions: ["BnBish", "BnSok", "BnMb", "Nal"], renderCell: RenderByStatus, editable: true },
     { field: "Date", headerName: "Date", type: "date", width: 95, renderCell: RenderByStatus, editable: true },
     { field: "DCItem", headerName: "DCItem", width: 80, type: "singleSelect", valueOptions: () => { return DCItemOptions.map((option) => option.Name); }, renderCell: RenderByStatus, editable: true },
     { field: "Description", headerName: "Description", width: 200, renderCell: RenderByStatus, editable: true },
