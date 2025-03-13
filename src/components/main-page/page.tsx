@@ -14,6 +14,7 @@ import { RenderByStatus } from './renderers';
 import { EditToolbar, WaitIcon } from './toolbar';
 import { styled } from '@mui/material/styles';
 import { SmartAddForm } from './smart-add-form';
+import "./page.css";
 
 
 export enum MainPageMode {

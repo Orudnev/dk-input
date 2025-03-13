@@ -1,10 +1,16 @@
+import { GeneratePseudoUniqueId } from "./web-api-wrapper";
+
 export enum TableNameEnum{
     None = "",
     JCommon = "JCommon",
     BnBish = "BnBish",
+    BnSok = "BnSok",
+    BnMb = "BnMb",
+    Nal = "Nal",
     Dest = "Dest",
     DCItems = "DCItems"
 }
+
 
 export enum StatusEnum{
     New = -1,
@@ -27,6 +33,9 @@ export interface IJCommonRow{
     Status:number
 }
 
+export function CreateNewJCommonRow():IJCommonRow{
+    return { Id: GeneratePseudoUniqueId(), Date: new Date(), DCItem: "", DestTable: TableNameEnum.None, Description: "", Dest: "", Sum: 0, Sign: -1, AddRowTime: new Date(), Status: StatusEnum.New };
+}
 export interface IDCItems{
     Name:string;
     Sign:number;
