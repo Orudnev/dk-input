@@ -68,12 +68,16 @@ export function MainPage() {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
 
+  //let lastEditedRow = Rows.reduce((max:any,item:any)=>item.AddRowTime>max.AddRowTime?item:max);
+
   const processRowUpdate = (newRow: GridRowModel, oldRow: GridRowModel) => {
     if (newRow.Status == StatusEnum.New) {
       newRow.Status = StatusEnum.NotProcessed;
     }
+    newRow.AddRowTime = new Date();
     let editedRowIndex = Rows.findIndex((row) => row.Id === newRow.Id);
     let newRows = [...Rows];
+
     AddOrUpdateRow(TableNameEnum.JCommon, newRow)
       .then((resp: any) => {
         let newValue = waitSave.filter(itm => itm != newRow.Id);
@@ -208,7 +212,7 @@ export function MainPage() {
     let tprops = { setRows: setRows, setRowModesModel, mainPageMode, setMainPageMode, rowSelectionModel, setRowSelectionModel, handleToolbarCmd };
     return(
       <div>
-        <SmartAddForm lookupRows={LookupRows} handleSubmit={(newRow)=>{
+        <SmartAddForm lookupRows={LookupRows} dcItemOptions={DCItemOptions} destOptions={DestOptions} handleSubmit={(newRow)=>{
           if(!newRow){
             setMainPageMode(MainPageMode.Regular);
             return;
@@ -225,7 +229,8 @@ export function MainPage() {
             setWaitSave(newWaitSave);
           })
           setMainPageMode(MainPageMode.Regular);
-        }} />
+        }}
+        />
       </div>
     );
   }

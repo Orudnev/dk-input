@@ -1,5 +1,5 @@
 .form-field{
-    min-width: 300px !important;
-    margin-right:10px ;
-    margin-bottom: 10px;
+    min-width: 100px !important;
+    margin-right:10px !important;
+    margin-bottom: 10px !important;
 }

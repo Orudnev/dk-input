@@ -1,7 +1,7 @@
 import axios from "axios";
 import { TableNameEnum } from "./common-types";
 
-const webApiBaseUrl = 'https://script.google.com/macros/s/AKfycbw5VxE_MLoPCGlmdy2WIdsVMkOSzqyqEhzB7_WizTjFKMCXhj40on1jPzUosxgsf1yc/exec';
+const webApiBaseUrl = 'https://script.google.com/macros/s/AKfycbwqGcqXejUXWcPBJu4-kltNAsqrUBLCcusYmWKui4fR-tj_8KjJwXLZ5HXdLxb69JgtZw/exec';
 
 
 export function GetAllRows(tableName:TableNameEnum):Promise<any>{
