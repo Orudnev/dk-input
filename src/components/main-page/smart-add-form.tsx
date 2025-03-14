@@ -1,7 +1,7 @@
 import * as React from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import { CreateNewJCommonRow, IDCItems, IJCommonRow, StatusEnum, TableNameEnum } from "../../common-types";
+import { CreateNewJCommonRow, IDCItems, IJCommonRow, RestoreUtfOffset, StatusEnum, TableNameEnum } from "../../common-types";
 import { CancelTwoTone, SaveTwoTone } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { GeneratePseudoUniqueId } from '../../web-api-wrapper';
@@ -16,12 +16,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 
 
-export interface ISmartAddFormProps {
-  lookupRows: IJCommonRow[];
-  dcItemOptions: IDCItems[];
-  destOptions: any[];
-  handleSubmit: (row?: IJCommonRow) => void;
-}
+
 
 
 export interface IInpField {
@@ -37,79 +32,18 @@ export interface IComboBox extends IInpField {
   options: string[]
 }
 
-function InpField(props: IInpField) {
-  const caption = props.label ? props.label : props.fldName;
-  if (props.type === 'date') {
-    const dateValueStr = props.row[props.fldName].toISOString().substring(0,10);
-    const dateValue = dayjs(dateValueStr);
-    return (
-      <DatePicker
-        label={caption}
-        className='form-field'
-        value={dateValue}
-        onChange={(newValue:any) => {
-          let newrow = { ...props.row };
-          if(newValue){
-            let offsetHours = new Date().getTimezoneOffset()/60;
-            newrow[props.fldName] = newValue.setHours(newValue.getHours() - offsetHours);
-            props.onChange(newrow);            
-          }
-        }} />
-    );
-  }
-  return (
-    <FormControl>
-      <TextField
-        label={caption}
-        className='form-field'
-        value={props.row[props.fldName]}
-        id={props.fldName}
-        onChange={(event) => {
-          let newrow = { ...props.row };
-          let newValueStr = event.target.value;
-          if (props.type === 'text') {
-            newrow[props.fldName] = newValueStr;
-          } else if (props.type === 'number') {
-            newrow[props.fldName] = Number(newValueStr);
-          }
-          props.onChange(newrow);
-        }}
-      />
-    </FormControl>
-  );
+
+export interface ISmartAddFormProps {
+  lookupRows: IJCommonRow[];
+  dcItemOptions: IDCItems[];
+  destOptions: any[];
+  handleSubmit: (row?: IJCommonRow) => void;
+  lastEditedRow?:IJCommonRow;
 }
-function ComboBox(props: IComboBox) {
-  const caption = props.label ? props.label : props.fldName;
-  return (
-    <FormControl>
-      <InputLabel id={`"lbl"${props.fldName}`}>{caption}</InputLabel>
-      <Select
-        label={caption}
-        id={`"fld"${props.fldName}`} labelId={`"lbl"${props.fldName}`}
-        className='form-field'
-        style={props.style}
-        value={props.row[props.fldName]}
-        onChange={(event: SelectChangeEvent) => {
-          let newrow = { ...props.row };
-          newrow[props.fldName] = event.target.value;
-          newrow.AddRowTime = new Date();
-          props.onChange(newrow);
-        }}
-      >
-        {props.options.map((opt: string) => {
-          return (<MenuItem key={opt} value={opt}>{opt}</MenuItem>);
-        })}
-      </Select>
-    </FormControl>
-  );
-}
-
-
-
 
 export function SmartAddForm(props: ISmartAddFormProps) {
   const opt = props.lookupRows.map(itm => { return { label: itm.Description, id: itm.Id } });
-  const [newRow, setNewRow] = React.useState<any>(CreateNewJCommonRow());
+  const [newRow, setNewRow] = React.useState<any>(CreateNewJCommonRow(RestoreUtfOffset(props.lastEditedRow?.Date)));
   return (
     <div>
       <Button color="primary" startIcon={<CancelTwoTone />} onClick={() => props.handleSubmit(undefined)}>Cancel</Button>
@@ -167,3 +101,74 @@ export function SmartAddForm(props: ISmartAddFormProps) {
     </div>
   )
 }
+
+
+function InpField(props: IInpField) {
+  const caption = props.label ? props.label : props.fldName;
+  if (props.type === 'date') {
+    const dateValueStr = props.row[props.fldName].toISOString().substring(0,10);
+    const dateValue = dayjs(dateValueStr);
+    return (
+      <DatePicker
+        label={caption}
+        className='form-field'
+        value={dateValue}
+        onChange={(newValue:any) => {
+          let newrow = { ...props.row };
+          if(newValue){
+            newrow[props.fldName] = RestoreUtfOffset(newValue);
+            props.onChange(newrow);            
+          }
+        }} />
+    );
+  }
+  return (
+    <FormControl>
+      <TextField
+        label={caption}
+        className='form-field'
+        value={props.row[props.fldName]}
+        id={props.fldName}
+        onChange={(event) => {
+          let newrow = { ...props.row };
+          let newValueStr = event.target.value;
+          if (props.type === 'text') {
+            newrow[props.fldName] = newValueStr;
+          } else if (props.type === 'number') {
+            newrow[props.fldName] = Number(newValueStr);
+          }
+          props.onChange(newrow);
+        }}
+      />
+    </FormControl>
+  );
+}
+function ComboBox(props: IComboBox) {
+  const caption = props.label ? props.label : props.fldName;
+  return (
+    <FormControl>
+      <InputLabel id={`"lbl"${props.fldName}`}>{caption}</InputLabel>
+      <Select
+        label={caption}
+        id={`"fld"${props.fldName}`} labelId={`"lbl"${props.fldName}`}
+        className='form-field'
+        style={props.style}
+        value={props.row[props.fldName]}
+        onChange={(event: SelectChangeEvent) => {
+          let newrow = { ...props.row };
+          newrow[props.fldName] = event.target.value;
+          newrow.AddRowTime = new Date();
+          props.onChange(newrow);
+        }}
+      >
+        {props.options.map((opt: string) => {
+          return (<MenuItem key={opt} value={opt}>{opt}</MenuItem>);
+        })}
+      </Select>
+    </FormControl>
+  );
+}
+
+
+
+

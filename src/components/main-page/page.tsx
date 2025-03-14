@@ -42,6 +42,7 @@ export function MainPage() {
         setIsLoading(false);
         data.invokeMethodResult.forEach((row: IJCommonRow) => {
           row.Date = new Date(row.Date);
+          row.AddRowTime = new Date(row.AddRowTime);
         });
         const regularRows = data.invokeMethodResult.filter((row: IJCommonRow) => row.Status < StatusEnum.Lookup);
         const lrows = data.invokeMethodResult.filter((row: IJCommonRow) => row.Status == StatusEnum.Lookup);
@@ -68,7 +69,6 @@ export function MainPage() {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
 
-  //let lastEditedRow = Rows.reduce((max:any,item:any)=>item.AddRowTime>max.AddRowTime?item:max);
 
   const processRowUpdate = (newRow: GridRowModel, oldRow: GridRowModel) => {
     if (newRow.Status == StatusEnum.New) {
@@ -209,11 +209,17 @@ export function MainPage() {
     noRowsComponent = NoRows;
   }
   if(mainPageMode === MainPageMode.SmartAddRow){
-    let tprops = { setRows: setRows, setRowModesModel, mainPageMode, setMainPageMode, rowSelectionModel, setRowSelectionModel, handleToolbarCmd };
+    //let tprops = { setRows: setRows, setRowModesModel, mainPageMode, setMainPageMode, rowSelectionModel, setRowSelectionModel, handleToolbarCmd };
+    let last_EditedRow = Rows.reduce((max:any,item:any)=>{
+      let result = item.AddRowTime>max.AddRowTime?item:max;
+      return result;
+    });
+  
     return(
       <div>
         <SmartAddForm lookupRows={LookupRows} dcItemOptions={DCItemOptions} destOptions={DestOptions} handleSubmit={(newRow)=>{
           if(!newRow){
+            setRowSelectionModel([]);
             setMainPageMode(MainPageMode.Regular);
             return;
           }
@@ -230,6 +236,7 @@ export function MainPage() {
           })
           setMainPageMode(MainPageMode.Regular);
         }}
+        lastEditedRow={last_EditedRow}
         />
       </div>
     );

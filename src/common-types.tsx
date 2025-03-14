@@ -33,8 +33,11 @@ export interface IJCommonRow{
     Status:number
 }
 
-export function CreateNewJCommonRow():IJCommonRow{
-    return { Id: GeneratePseudoUniqueId(), Date: new Date(), DCItem: "", DestTable: TableNameEnum.None, Description: "", Dest: "", Sum: 0, Sign: -1, AddRowTime: new Date(), Status: StatusEnum.New };
+export function CreateNewJCommonRow(date?:Date):IJCommonRow{
+    if(!date){
+        date = new Date();
+    }
+    return { Id: GeneratePseudoUniqueId(), Date: date, DCItem: "", DestTable: TableNameEnum.None, Description: "", Dest: "", Sum: 0, Sign: -1, AddRowTime: new Date(), Status: StatusEnum.New };
 }
 export interface IDCItems{
     Name:string;
@@ -48,5 +51,14 @@ export interface IApiResponse{
     error:any;
     eventObj:any;
     invokeMethodResult:any;
+}
+
+export function RestoreUtfOffset(date?:Date):Date{
+    if(!date){
+        date = new Date();
+    }
+    const offsetHours = new Date().getTimezoneOffset()/60;
+    date.setHours(date.getHours() - offsetHours);
+    return date;
 }
 
