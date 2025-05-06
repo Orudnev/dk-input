@@ -34,6 +34,14 @@ export function DeleteRows(tableName:TableNameEnum,rowIdArray:string[]):Promise<
     });
 }
 
+export function GetTotalsWithJcommon(tableName:TableNameEnum,rowIdArray:string[]):Promise<any>{
+    return axios({
+        url:webApiBaseUrl, 
+        method:'GET',
+        params:{method:"getTotalsWithJcommon"}
+    });
+}
+
 export function GeneratePseudoUniqueId(){
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     const timestamp = Date.now().toString(36).toUpperCase().slice(-4); // Берем последние 4 символа от числа в 36-ричной системе

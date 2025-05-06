@@ -3,3 +3,16 @@
     margin-right:10px !important;
     margin-bottom: 10px !important;
 }
+.totals{
+   border : 1px solid lightgray;
+   border-radius: 5px; 
+   padding: 10px;
+   margin-bottom: 10px;
+   width:300px;
+}
+
+.totals_item{
+    display: inline-block;
+    margin-right: 10px;
+    font-family: arial;
+}

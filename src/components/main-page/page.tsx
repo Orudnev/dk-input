@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AddOrUpdateRow, DeleteRows, GetAllRows } from '../../web-api-wrapper';
-import { IApiResponse, IDCItems, IJCommonRow, StatusEnum, TableNameEnum } from '../../common-types';
+import { IApiResponse, IDCItems, IJCommonRow, ITotals, StatusEnum, TableNameEnum } from '../../common-types';
 import { GridColDef, GridActionsCellItem, GridRowId, GridRowModesModel, GridRowModes, GridSlotProps, GridRowsProp, GridToolbarContainer, GridRenderCellParams, GridRowModel, GridRowSelectionModel } from "@mui/x-data-grid";
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
@@ -15,6 +15,7 @@ import { EditToolbar, WaitIcon } from './toolbar';
 import { styled } from '@mui/material/styles';
 import { SmartAddForm } from './smart-add-form';
 import "./page.css";
+import { Totals } from './totals';
 
 
 export enum MainPageMode {
@@ -32,6 +33,8 @@ export function MainPage() {
   const [DCItemOptions, setDCItemOptions] = useState<IDCItems[]>([{ Name: "Loading...", Dest: "", Sign: 0 }]);
   const [waitSave, setWaitSave] = useState<string[]>([]);
   const [mainPageMode, setMainPageMode] = useState<MainPageMode>(MainPageMode.Regular);
+  const undefinedTotals:ITotals = {BnBish:-1,BnSok:-1,BnMb:-1,Nal:-1};  
+  const [totalsData,setTotalsData] = useState<ITotals>(undefinedTotals);
   const loadRows = () => {
     setIsLoading(true);
     GetAllRows(TableNameEnum.JCommon)
@@ -243,6 +246,7 @@ export function MainPage() {
   }
   return (
     <div>
+      <Totals {...totalsData} />
       <DataGrid getRowId={(row) => row.Id}
         rows={Rows}
         columns={JCommonColumns as any}

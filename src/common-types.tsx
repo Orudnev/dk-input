@@ -33,6 +33,13 @@ export interface IJCommonRow{
     Status:number
 }
 
+export interface ITotals{
+    BnBish:number;
+    BnSok:number;
+    BnMb:number;
+    Nal:number;
+}
+
 export function CreateNewJCommonRow(date?:Date):IJCommonRow{
     if(!date){
         date = new Date();
