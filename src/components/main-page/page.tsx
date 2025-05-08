@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { AddOrUpdateRow, DeleteRows, GetAllRows } from '../../web-api-wrapper';
-import { IApiResponse, IDCItems, IJCommonRow, ITotals, StatusEnum, TableNameEnum } from '../../common-types';
+import { AddOrUpdateRow, DeleteRows, GetAllRows, GetTotalsWithJcommon } from '../../web-api-wrapper';
+import { IApiResponse, IAppScriptResponse, IDCItems, IJCommonRow, ITotals, StatusEnum, TableNameEnum } from '../../common-types';
 import { GridColDef, GridActionsCellItem, GridRowId, GridRowModesModel, GridRowModes, GridSlotProps, GridRowsProp, GridToolbarContainer, GridRenderCellParams, GridRowModel, GridRowSelectionModel } from "@mui/x-data-grid";
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
@@ -25,6 +25,8 @@ export enum MainPageMode {
 }
 export function MainPage() {
   const [Rows, setRows] = useState<IJCommonRow[]>([]);
+  const undefinedTotals: ITotals = { BnBish: -1, BnSok: -1, BnMb: -1, Nal: -1 };
+  const [totalsData, setTotalsData] = useState<ITotals>(undefinedTotals);
   const [IsLoading, setIsLoading] = useState<boolean>(false);
   const [LookupRows, setLookuprows] = useState<IJCommonRow[]>([]);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
@@ -33,8 +35,6 @@ export function MainPage() {
   const [DCItemOptions, setDCItemOptions] = useState<IDCItems[]>([{ Name: "Loading...", Dest: "", Sign: 0 }]);
   const [waitSave, setWaitSave] = useState<string[]>([]);
   const [mainPageMode, setMainPageMode] = useState<MainPageMode>(MainPageMode.Regular);
-  const undefinedTotals:ITotals = {BnBish:-1,BnSok:-1,BnMb:-1,Nal:-1};  
-  const [totalsData,setTotalsData] = useState<ITotals>(undefinedTotals);
   const loadRows = () => {
     setIsLoading(true);
     GetAllRows(TableNameEnum.JCommon)
@@ -50,6 +50,16 @@ export function MainPage() {
         const regularRows = data.invokeMethodResult.filter((row: IJCommonRow) => row.Status < StatusEnum.Lookup);
         const lrows = data.invokeMethodResult.filter((row: IJCommonRow) => row.Status == StatusEnum.Lookup);
         setRows(regularRows);
+        setTotalsData(undefinedTotals);
+        GetTotalsWithJcommon().then((resp: IAppScriptResponse<IApiResponse>) => {
+          if (!resp.data.isOk) {
+            setTotalsData(undefinedTotals);
+            return;
+          }
+          setTotalsData(resp.data.invokeMethodResult);
+        }).catch(err => {
+          var s = 1;
+        });
         setLookuprows(lrows);
       })
       .catch(err => {
@@ -211,17 +221,18 @@ export function MainPage() {
   } else {
     noRowsComponent = NoRows;
   }
-  if(mainPageMode === MainPageMode.SmartAddRow){
-    //let tprops = { setRows: setRows, setRowModesModel, mainPageMode, setMainPageMode, rowSelectionModel, setRowSelectionModel, handleToolbarCmd };
-    let last_EditedRow = Rows.reduce((max:any,item:any)=>{
-      let result = item.AddRowTime>max.AddRowTime?item:max;
-      return result;
-    });
-  
-    return(
+  if (mainPageMode === MainPageMode.SmartAddRow) {
+    let last_EditedRow = null;
+    if(Rows.length > 0){
+      last_EditedRow = Rows.reduce((max: any, item: any) => {
+        let result = item.AddRowTime > max.AddRowTime ? item : max;
+        return result;
+      });  
+    }
+    return (
       <div>
-        <SmartAddForm lookupRows={LookupRows} dcItemOptions={DCItemOptions} destOptions={DestOptions} handleSubmit={(newRow)=>{
-          if(!newRow){
+        <SmartAddForm lookupRows={LookupRows} dcItemOptions={DCItemOptions} destOptions={DestOptions} handleSubmit={(newRow) => {
+          if (!newRow) {
             setRowSelectionModel([]);
             setMainPageMode(MainPageMode.Regular);
             return;
@@ -233,19 +244,19 @@ export function MainPage() {
           setRows(newRows);
           setWaitSave(newWaitSave);
           AddOrUpdateRow(TableNameEnum.JCommon, newRow)
-          .then((resp: any) => {
-            let newWaitSave = waitSave.filter(itm => itm != newRow.Id);
-            setWaitSave(newWaitSave);
-          })
+            .then((resp: any) => {
+              let newWaitSave = waitSave.filter(itm => itm != newRow.Id);
+              setWaitSave(newWaitSave);
+            })
           setMainPageMode(MainPageMode.Regular);
         }}
-        lastEditedRow={last_EditedRow}
+          lastEditedRow={last_EditedRow}
         />
       </div>
     );
   }
   return (
-    <div>
+    <div className='main-page'>
       <Totals {...totalsData} />
       <DataGrid getRowId={(row) => row.Id}
         rows={Rows}

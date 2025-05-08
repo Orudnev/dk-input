@@ -52,6 +52,10 @@ export interface IDCItems{
     Dest:string;
 }
 
+export interface IAppScriptResponse<T>{
+    data:T;
+}
+
 export interface IApiResponse{
     isOk:boolean;
     receivedParams:any;

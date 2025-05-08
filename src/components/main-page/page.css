@@ -1,3 +1,6 @@
+.main-page{
+    max-width: 720px;
+}
 .form-field{
     min-width: 100px !important;
     margin-right:10px !important;
@@ -8,11 +11,21 @@
    border-radius: 5px; 
    padding: 10px;
    margin-bottom: 10px;
-   width:300px;
+   width:450px;
 }
-
-.totals_item{
+.totals-item{
     display: inline-block;
     margin-right: 10px;
-    font-family: arial;
+    font-family: arial;    
+}
+.totals-item_label{
+    display: inline-block;
+    color:grey
+}
+
+.totals-item_value{
+    display: inline-block;
+    margin-left: 5px;
+    font-weight: bold;
+    color: green;
 }

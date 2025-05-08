@@ -38,7 +38,7 @@ export interface ISmartAddFormProps {
   dcItemOptions: IDCItems[];
   destOptions: any[];
   handleSubmit: (row?: IJCommonRow) => void;
-  lastEditedRow?:IJCommonRow;
+  lastEditedRow?:IJCommonRow|null;
 }
 
 export function SmartAddForm(props: ISmartAddFormProps) {

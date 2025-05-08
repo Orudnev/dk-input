@@ -1,7 +1,7 @@
 import axios from "axios";
-import { TableNameEnum } from "./common-types";
+import { IApiResponse, IAppScriptResponse, ITotals, TableNameEnum } from "./common-types";
 
-const webApiBaseUrl = 'https://script.google.com/macros/s/AKfycbwqGcqXejUXWcPBJu4-kltNAsqrUBLCcusYmWKui4fR-tj_8KjJwXLZ5HXdLxb69JgtZw/exec';
+const webApiBaseUrl = 'https://script.google.com/macros/s/AKfycbyXUYaq-N1Bqi0Pagzo8MqcSUK9YhsZJ7Ny2RrSpalZxGBksr4ROR5KEZBDY8Iog3I08A/exec';
 
 
 export function GetAllRows(tableName:TableNameEnum):Promise<any>{
@@ -34,7 +34,7 @@ export function DeleteRows(tableName:TableNameEnum,rowIdArray:string[]):Promise<
     });
 }
 
-export function GetTotalsWithJcommon(tableName:TableNameEnum,rowIdArray:string[]):Promise<any>{
+export function GetTotalsWithJcommon():Promise<IAppScriptResponse<IApiResponse>>{
     return axios({
         url:webApiBaseUrl, 
         method:'GET',
