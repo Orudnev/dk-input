@@ -38,7 +38,8 @@ export interface ISmartAddFormProps {
   dcItemOptions: IDCItems[];
   destOptions: any[];
   handleSubmit: (row?: IJCommonRow) => void;
-  lastEditedRow?:IJCommonRow|null;
+  //handleLookupApply:(row: IJCommonRow) => void;
+  lastEditedRow?:IJCommonRow;
 }
 
 export function SmartAddForm(props: ISmartAddFormProps) {
@@ -69,6 +70,7 @@ export function SmartAddForm(props: ISmartAddFormProps) {
                   row.Sum = lookupRow.Sum;
                   row.Sign = lookupRow.Sign;
                   row.Status = StatusEnum.NotProcessed;
+                  //props.handleLookupApply(row);
                   setNewRow(row);
                 }
               }}
@@ -116,7 +118,7 @@ function InpField(props: IInpField) {
         onChange={(newValue:any) => {
           let newrow = { ...props.row };
           if(newValue){
-            newrow[props.fldName] = RestoreUtfOffset(newValue);
+            newrow[props.fldName] = RestoreUtfOffset(new Date(newValue.toString()));
             props.onChange(newrow);            
           }
         }} />

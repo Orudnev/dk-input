@@ -222,34 +222,35 @@ export function MainPage() {
     noRowsComponent = NoRows;
   }
   if (mainPageMode === MainPageMode.SmartAddRow) {
-    let last_EditedRow = null;
-    if(Rows.length > 0){
+    let last_EditedRow = undefined;
+    if (Rows.length > 0) {
       last_EditedRow = Rows.reduce((max: any, item: any) => {
         let result = item.AddRowTime > max.AddRowTime ? item : max;
         return result;
-      });  
+      });
     }
     return (
       <div>
-        <SmartAddForm lookupRows={LookupRows} dcItemOptions={DCItemOptions} destOptions={DestOptions} handleSubmit={(newRow) => {
-          if (!newRow) {
-            setRowSelectionModel([]);
+        <SmartAddForm lookupRows={LookupRows} dcItemOptions={DCItemOptions} destOptions={DestOptions}
+          handleSubmit={(newRow) => {
+            if (!newRow) {
+              setRowSelectionModel([]);
+              setMainPageMode(MainPageMode.Regular);
+              return;
+            }
+            const newRows = [...Rows];
+            newRows.push(newRow);
+            let newWaitSave = [...waitSave];
+            newWaitSave.push(newRow.Id);
+            setRows(newRows);
+            setWaitSave(newWaitSave);
+            AddOrUpdateRow(TableNameEnum.JCommon, newRow)
+              .then((resp: any) => {
+                let newWaitSave = waitSave.filter(itm => itm != newRow.Id);
+                setWaitSave(newWaitSave);
+              })
             setMainPageMode(MainPageMode.Regular);
-            return;
-          }
-          const newRows = [...Rows];
-          newRows.push(newRow);
-          let newWaitSave = [...waitSave];
-          newWaitSave.push(newRow.Id);
-          setRows(newRows);
-          setWaitSave(newWaitSave);
-          AddOrUpdateRow(TableNameEnum.JCommon, newRow)
-            .then((resp: any) => {
-              let newWaitSave = waitSave.filter(itm => itm != newRow.Id);
-              setWaitSave(newWaitSave);
-            })
-          setMainPageMode(MainPageMode.Regular);
-        }}
+          }}
           lastEditedRow={last_EditedRow}
         />
       </div>
