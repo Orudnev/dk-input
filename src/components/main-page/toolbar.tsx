@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { GridRowModes, GridRowSelectionModel, GridSlotProps, GridToolbarContainer } from "@mui/x-data-grid";
 import AddIcon from '@mui/icons-material/Add';
-import { CheckBoxOutlineBlankOutlined, CheckBoxOutlined, DeleteOutlineOutlined, DnsTwoTone, CancelTwoTone, SaveTwoTone } from '@mui/icons-material';
+import { CheckBoxOutlineBlankOutlined, CheckBoxOutlined, DeleteOutlineOutlined, DnsTwoTone, CancelTwoTone, SaveTwoTone,DoubleArrowTwoTone } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { GeneratePseudoUniqueId } from '../../web-api-wrapper';
 import { GridRowModesModel, GridRenderCellParams } from "@mui/x-data-grid";
@@ -44,6 +44,7 @@ export function EditToolbar(props: GridSlotProps['toolbar']) {
                           : null;
   const deleteBtn = props.rowSelectionModel.length > 0 && <Button color="primary" startIcon={<DeleteOutlineOutlined />} onClick={() => props.handleToolbarCmd("Delete")}>Delete</Button>; 
   const toLookupBtn = props.rowSelectionModel.length > 0 && <Button color="primary" startIcon={<DnsTwoTone />} onClick={() => props.handleToolbarCmd("ToLookup")}>To Lookup</Button>;
+  const commitBtn = <Button color="primary" startIcon={<DoubleArrowTwoTone />} onClick={() => props.handleToolbarCmd("Commit")}>Commit</Button>;
   return (
     <GridToolbarContainer>
       {addBtn}      
@@ -51,6 +52,7 @@ export function EditToolbar(props: GridSlotProps['toolbar']) {
       {selectBtn}      
       {deleteBtn}
       {toLookupBtn}
+      {commitBtn}
     </GridToolbarContainer>
   );
 }

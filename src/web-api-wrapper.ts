@@ -1,7 +1,8 @@
 import axios from "axios";
 import { IApiResponse, IAppScriptResponse, ITotals, TableNameEnum } from "./common-types";
 
-const webApiBaseUrl = 'https://script.google.com/macros/s/AKfycbyXUYaq-N1Bqi0Pagzo8MqcSUK9YhsZJ7Ny2RrSpalZxGBksr4ROR5KEZBDY8Iog3I08A/exec';
+const webApiBaseUrl = 'https://script.google.com/macros/s/AKfycbxP55AhGyxvLZiJqn7_SAmO74JOZGkHh4z-cl2MuyPapKckoR0EVtoFILcEOwnBdIPnAw/exec';
+
 
 
 export function GetAllRows(tableName:TableNameEnum):Promise<any>{
@@ -39,6 +40,14 @@ export function GetTotalsWithJcommon():Promise<IAppScriptResponse<IApiResponse>>
         url:webApiBaseUrl, 
         method:'GET',
         params:{method:"getTotalsWithJcommon"}
+    });
+}
+
+export function Commit():Promise<IAppScriptResponse<IApiResponse>>{
+    return axios({
+        url:webApiBaseUrl, 
+        method:'GET',
+        params:{method:"commit"}
     });
 }
 

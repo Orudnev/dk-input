@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AddOrUpdateRow, DeleteRows, GetAllRows, GetTotalsWithJcommon } from '../../web-api-wrapper';
+import { AddOrUpdateRow, DeleteRows, GetAllRows, GetTotalsWithJcommon,Commit } from '../../web-api-wrapper';
 import { IApiResponse, IAppScriptResponse, IDCItems, IJCommonRow, ITotals, StatusEnum, TableNameEnum } from '../../common-types';
 import { GridColDef, GridActionsCellItem, GridRowId, GridRowModesModel, GridRowModes, GridSlotProps, GridRowsProp, GridToolbarContainer, GridRenderCellParams, GridRowModel, GridRowSelectionModel } from "@mui/x-data-grid";
 import EditIcon from '@mui/icons-material/Edit';
@@ -147,6 +147,14 @@ export function MainPage() {
         break;
       case "SmartAdd":
         setMainPageMode(MainPageMode.SmartAddRow);
+        break;
+      case "Commit":
+        if(Rows.length > 0){
+          setIsLoading(true);
+          Commit().then((resp:IAppScriptResponse<any>)=>{
+            setIsLoading(false);
+          });
+        }
         break;
       // case "Cancel":
       //   setMainPageMode(MainPageMode.Regular);
