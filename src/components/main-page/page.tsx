@@ -290,7 +290,7 @@ export function MainPage() {
     noRowsComponent = NoRows;
   }
   if (mainPageMode === MainPageMode.SmartAddRow) {
-    let last_EditedRow = null;
+    let last_EditedRow = undefined;
     if (Rows.length > 0) {
       last_EditedRow = Rows.reduce((max: any, item: any) => {
         let result = item.AddRowTime > max.AddRowTime ? item : max;
