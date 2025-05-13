@@ -33,6 +33,29 @@ export interface IJCommonRow{
     Status:number
 }
 
+export interface IAccountRow{
+    Id:string;
+    Date:Date;
+    DCItem:string;
+    Dest:string;
+    Description:string,
+    Sum:number;
+    Sign:number;
+    Total:number;
+    Status:number;
+}
+
+
+export interface IAllTablesContentDTO{
+    JCommon: IJCommonRow[];
+    BnBish: IAccountRow[];
+    BnSok: IAccountRow[];
+    BnMb: IAccountRow[];
+    Nal: IAccountRow[];
+    Dest:string[];
+    DCItems:IDCItems[];
+}
+
 export interface ITotals{
     BnBish:number;
     BnSok:number;

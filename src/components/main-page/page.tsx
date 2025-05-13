@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { AddOrUpdateRow, DeleteRows, GetAllRows, GetTotalsWithJcommon,Commit } from '../../web-api-wrapper';
-import { IApiResponse, IAppScriptResponse, IDCItems, IJCommonRow, ITotals, StatusEnum, TableNameEnum } from '../../common-types';
+import { AddOrUpdateRow, DeleteRows, GetAllRows, GetAllTablesContent, GetTotalsWithJcommon } from '../../web-api-wrapper';
+import { IAccountRow, IAllTablesContentDTO, IApiResponse, IAppScriptResponse, IDCItems, IJCommonRow, ITotals, StatusEnum, TableNameEnum } from '../../common-types';
 import { GridColDef, GridActionsCellItem, GridRowId, GridRowModesModel, GridRowModes, GridSlotProps, GridRowsProp, GridToolbarContainer, GridRenderCellParams, GridRowModel, GridRowSelectionModel } from "@mui/x-data-grid";
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
@@ -16,13 +16,87 @@ import { styled } from '@mui/material/styles';
 import { SmartAddForm } from './smart-add-form';
 import "./page.css";
 import { Totals } from './totals';
-
+import { useStore, useSelector } from 'react-redux'
+import { IAppSettings } from '../../Reducers/app';
 
 export enum MainPageMode {
   Regular,
   SelectRows,
   SmartAddRow
 }
+
+function convertArrayToJCommonRows(rows: any[]): IJCommonRow[] {
+  let result: IJCommonRow[] = [];
+  rows.forEach((row) => {
+    let newRow: IJCommonRow = {
+      Id: row[0],
+      Dest: row[1],
+      Date: new Date(row[2]),
+      DCItem: row[3],
+      Description: row[4],
+      DestTable: row[5],
+      Sum: row[6],
+      Sign: row[7],
+      AddRowTime: new Date(row[8]),
+      Status: row[9]
+    };
+    result.push(newRow);
+  });
+  return result;
+}
+
+function convertArrayToAccountRows(rows: any[]): IAccountRow[] {
+  let result: IAccountRow[] = [];
+  rows.forEach((row) => {
+    let newRow: IAccountRow = {
+      Id: row[0],
+      Date: new Date(row[1]),
+      DCItem: row[2],
+      Dest: row[3],
+      Description: row[4],
+      Sum: row[5],
+      Sign: row[6],
+      Total: row[7],
+      Status: row[8]
+    };
+    result.push(newRow);
+  });
+  return result;
+}
+
+function convertArrayToDCItemRows(rows:any[]): IDCItems[] {
+  let result: IDCItems[] = [];
+  rows.forEach((row) => {
+    let newRow: IDCItems = {
+      Name: row[0],
+      Sign: row[1],
+      Dest: row[2]
+    };
+    result.push(newRow);
+  });
+  return result;
+}
+
+function calculateTotals(currJcRows: IJCommonRow[],allTblContent:IAllTablesContentDTO):ITotals {
+  let calcTotals = (rows:IAccountRow[],tableName:string) => {
+    let accTotals = rows.reduce((acc, row) => {
+        if(row.DCItem == 'Вх.Остаток'){
+          return row.Total;
+        }
+        return acc + row.Sum*row.Sign;  
+    },0);
+    let jcTotals = currJcRows.filter(row=>row.DestTable==tableName).reduce((acc, row) => acc + row.Sum,0);
+    return accTotals+jcTotals;
+  }
+  let result:ITotals={
+    BnBish:calcTotals(allTblContent.BnBish,"BnBish"),
+    BnMb:calcTotals(allTblContent.BnMb,"BnMb"),
+    BnSok:calcTotals(allTblContent.BnSok,"BnSok"),
+    Nal:calcTotals(allTblContent.Nal,"Nal")
+  };
+  return result;
+}
+
 export function MainPage() {
   const [Rows, setRows] = useState<IJCommonRow[]>([]);
   const undefinedTotals: ITotals = { BnBish: -1, BnSok: -1, BnMb: -1, Nal: -1 };
@@ -31,52 +105,46 @@ export function MainPage() {
   const [LookupRows, setLookuprows] = useState<IJCommonRow[]>([]);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>([]);
-  const [DestOptions, setDestOptions] = useState<any[]>([{ Name: "Loading..." }]);
-  const [DCItemOptions, setDCItemOptions] = useState<IDCItems[]>([{ Name: "Loading...", Dest: "", Sign: 0 }]);
+  //const [DestOptions, setDestOptions] = useState<any[]>([{ Name: "Loading..." }]);
+  //const [DCItemOptions, setDCItemOptions] = useState<IDCItems[]>([{ Name: "Loading...", Dest: "", Sign: 0 }]);
   const [waitSave, setWaitSave] = useState<string[]>([]);
   const [mainPageMode, setMainPageMode] = useState<MainPageMode>(MainPageMode.Regular);
-  const loadRows = () => {
+  const store = useStore();
+  const DestRows = useSelector((state: any) => state.AppReducer.tablesContent.Dest);
+  const DCItemRows = useSelector((state: any) => state.AppReducer.tablesContent.DCItems);
+  const reloadRows = () => {
     setIsLoading(true);
-    GetAllRows(TableNameEnum.JCommon)
+    GetAllTablesContent()
       .then((resp: any) => {
-        return resp.data;
-      })
-      .then((data: IApiResponse) => {
         setIsLoading(false);
-        data.invokeMethodResult.forEach((row: IJCommonRow) => {
-          row.Date = new Date(row.Date);
-          row.AddRowTime = new Date(row.AddRowTime);
-        });
-        const regularRows = data.invokeMethodResult.filter((row: IJCommonRow) => row.Status < StatusEnum.Lookup);
-        const lrows = data.invokeMethodResult.filter((row: IJCommonRow) => row.Status == StatusEnum.Lookup);
+        if (!resp.data.isOk) throw new Error(resp.data.error);
+        return resp.data.invokeMethodResult;
+      })
+      .then((data: IAllTablesContentDTO) => {
+        let allTblContentDTO: IAllTablesContentDTO = {
+          JCommon: convertArrayToJCommonRows(data.JCommon),
+          BnBish: convertArrayToAccountRows(data.BnBish), 
+          BnSok: convertArrayToAccountRows(data.BnSok),
+          BnMb: convertArrayToAccountRows(data.BnMb),
+          Nal: convertArrayToAccountRows(data.Nal),
+          Dest: (()=>data.Dest.map(itm=>itm[0]))(),
+          DCItems: convertArrayToDCItemRows(data.DCItems)
+        }
+        store.dispatch({ type: 'AllTablesContent', tablesContent: allTblContentDTO });
+        setIsLoading(false);
+        const regularRows = allTblContentDTO.JCommon.filter((row: IJCommonRow) => row.Status < StatusEnum.Lookup);
+        const lrows = allTblContentDTO.JCommon.filter((row: IJCommonRow) => row.Status == StatusEnum.Lookup);
         setRows(regularRows);
-        setTotalsData(undefinedTotals);
-        GetTotalsWithJcommon().then((resp: IAppScriptResponse<IApiResponse>) => {
-          if (!resp.data.isOk) {
-            setTotalsData(undefinedTotals);
-            return;
-          }
-          setTotalsData(resp.data.invokeMethodResult);
-        }).catch(err => {
-          var s = 1;
-        });
+        let totals = calculateTotals(regularRows,allTblContentDTO);
+        setTotalsData(totals);
         setLookuprows(lrows);
       })
       .catch(err => {
-        let s = 1;
+        setIsLoading(false);
       });
   };
   useEffect(() => {
-    loadRows();
-    GetAllRows(TableNameEnum.Dest)
-      .then((resp: any) => {
-        setIsLoading(false);
-        setDestOptions(resp.data.invokeMethodResult);
-      });
-    GetAllRows(TableNameEnum.DCItems)
-      .then((resp: any) => {
-        setDCItemOptions(resp.data.invokeMethodResult)
-      })
+    reloadRows();
   }, []);
   const handleEditClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
@@ -127,7 +195,7 @@ export function MainPage() {
       case "Delete":
         DeleteRows(TableNameEnum.JCommon, selectedRows)
           .then((resp: any) => {
-            loadRows();
+            reloadRows();
           });
         setRows([]);
         break;
@@ -142,19 +210,11 @@ export function MainPage() {
         });
         Promise.all(requestList).then((resp: any) => {
           setRows([]);
-          loadRows();
+          reloadRows();
         });
         break;
       case "SmartAdd":
         setMainPageMode(MainPageMode.SmartAddRow);
-        break;
-      case "Commit":
-        if(Rows.length > 0){
-          setIsLoading(true);
-          Commit().then((resp:IAppScriptResponse<any>)=>{
-            setIsLoading(false);
-          });
-        }
         break;
       // case "Cancel":
       //   setMainPageMode(MainPageMode.Regular);
@@ -213,12 +273,12 @@ export function MainPage() {
     },
     { field: "DestTable", headerName: "DstTbl", width: 70, type: "singleSelect", valueOptions: ["BnBish", "BnSok", "BnMb", "Nal"], renderCell: RenderByStatus, editable: true },
     { field: "Date", headerName: "Date", type: "date", width: 95, renderCell: RenderByStatus, editable: true },
-    { field: "DCItem", headerName: "DCItem", width: 80, type: "singleSelect", valueOptions: () => { return DCItemOptions.map((option) => option.Name); }, renderCell: RenderByStatus, editable: true },
+    { field: "DCItem", headerName: "DCItem", width: 80, type: "singleSelect", valueOptions: () => { return DCItemRows.map((option:any) => option.Name); }, renderCell: RenderByStatus, editable: true },
     { field: "Description", headerName: "Description", width: 200, renderCell: RenderByStatus, editable: true },
     {
       field: "Dest", headerName: "Dest", width: 80, type: "singleSelect",
       valueOptions: () => {
-        return DestOptions.map((option) => option.Name);
+        return DestRows.map((option: any) => {return {name:option}});
       }, renderCell: RenderByStatus, editable: true
     },
     { field: "Sum", headerName: "Sum", width: 100, type: "number", renderCell: RenderByStatus, editable: true }
@@ -230,7 +290,7 @@ export function MainPage() {
     noRowsComponent = NoRows;
   }
   if (mainPageMode === MainPageMode.SmartAddRow) {
-    let last_EditedRow = undefined;
+    let last_EditedRow = null;
     if (Rows.length > 0) {
       last_EditedRow = Rows.reduce((max: any, item: any) => {
         let result = item.AddRowTime > max.AddRowTime ? item : max;
@@ -239,26 +299,25 @@ export function MainPage() {
     }
     return (
       <div>
-        <SmartAddForm lookupRows={LookupRows} dcItemOptions={DCItemOptions} destOptions={DestOptions}
-          handleSubmit={(newRow) => {
-            if (!newRow) {
-              setRowSelectionModel([]);
-              setMainPageMode(MainPageMode.Regular);
-              return;
-            }
-            const newRows = [...Rows];
-            newRows.push(newRow);
-            let newWaitSave = [...waitSave];
-            newWaitSave.push(newRow.Id);
-            setRows(newRows);
-            setWaitSave(newWaitSave);
-            AddOrUpdateRow(TableNameEnum.JCommon, newRow)
-              .then((resp: any) => {
-                let newWaitSave = waitSave.filter(itm => itm != newRow.Id);
-                setWaitSave(newWaitSave);
-              })
+        <SmartAddForm lookupRows={LookupRows} dcItemOptions={DCItemRows} destOptions={DestRows.map((itm: any) => { return { Name: itm } })} handleSubmit={(newRow) => {
+          if (!newRow) {
+            setRowSelectionModel([]);
             setMainPageMode(MainPageMode.Regular);
-          }}
+            return;
+          }
+          const newRows = [...Rows];
+          newRows.push(newRow);
+          let newWaitSave = [...waitSave];
+          newWaitSave.push(newRow.Id);
+          setRows(newRows);
+          setWaitSave(newWaitSave);
+          AddOrUpdateRow(TableNameEnum.JCommon, newRow)
+            .then((resp: any) => {
+              let newWaitSave = waitSave.filter(itm => itm != newRow.Id);
+              setWaitSave(newWaitSave);
+            })
+          setMainPageMode(MainPageMode.Regular);
+        }}
           lastEditedRow={last_EditedRow}
         />
       </div>
