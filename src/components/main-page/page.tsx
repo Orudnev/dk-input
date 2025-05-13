@@ -282,7 +282,7 @@ export function MainPage() {
     {
       field: "Dest", headerName: "Dest", width: 80, type: "singleSelect",
       valueOptions: () => {
-        return DestRows.map((option: any) => {return {name:option}});
+        return DestRows;
       }, renderCell: RenderByStatus, editable: true
     },
     { field: "Sum", headerName: "Sum", width: 100, type: "number", renderCell: RenderByStatus, editable: true }
