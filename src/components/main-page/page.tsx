@@ -30,11 +30,11 @@ function convertArrayToJCommonRows(rows: any[]): IJCommonRow[] {
   rows.forEach((row) => {
     let newRow: IJCommonRow = {
       Id: row[0],
-      Dest: row[1],
+      DestTable: row[1],
       Date: new Date(row[2]),
       DCItem: row[3],
       Description: row[4],
-      DestTable: row[5],
+      Dest: row[5],
       Sum: row[6],
       Sign: row[7],
       AddRowTime: new Date(row[8]),
@@ -85,7 +85,7 @@ function calculateTotals(currJcRows: IJCommonRow[],allTblContent:IAllTablesConte
         }
         return acc + row.Sum*row.Sign;  
     },0);
-    let jcTotals = currJcRows.filter(row=>row.DestTable==tableName).reduce((acc, row) => acc + row.Sum,0);
+    let jcTotals = currJcRows.filter(row=>row.DestTable==tableName && (row.Status == undefined || row.Status == 0)).reduce((acc, row) => acc + row.Sum*row.Sign,0);
     return accTotals+jcTotals;
   }
   let result:ITotals={
@@ -110,6 +110,7 @@ export function MainPage() {
   const [waitSave, setWaitSave] = useState<string[]>([]);
   const [mainPageMode, setMainPageMode] = useState<MainPageMode>(MainPageMode.Regular);
   const store = useStore();
+  const AllTables = useSelector((state: any) => state.AppReducer.tablesContent);
   const DestRows = useSelector((state: any) => state.AppReducer.tablesContent.Dest);
   const DCItemRows = useSelector((state: any) => state.AppReducer.tablesContent.DCItems);
   const reloadRows = () => {
@@ -166,6 +167,9 @@ export function MainPage() {
       })
     newRows[editedRowIndex] = newRow as any;
     setRows(newRows);
+    let totals = calculateTotals(newRows,AllTables);
+    setTotalsData(totals);
+
     return newRow; // Обязательно вернуть строку
   };
   const handleSaveClick = (params: any) => () => {
@@ -310,6 +314,8 @@ export function MainPage() {
           let newWaitSave = [...waitSave];
           newWaitSave.push(newRow.Id);
           setRows(newRows);
+          let totals = calculateTotals(newRows,AllTables);
+          setTotalsData(totals);      
           setWaitSave(newWaitSave);
           AddOrUpdateRow(TableNameEnum.JCommon, newRow)
             .then((resp: any) => {
