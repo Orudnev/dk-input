@@ -43,7 +43,7 @@ export interface ISmartAddFormProps {
 }
 
 export function SmartAddForm(props: ISmartAddFormProps) {
-  const opt = props.lookupRows.map(itm => { return { label: itm.Description, id: itm.Id } });
+  const opt = props.lookupRows.map(itm => { return { label: itm.Description, id: itm.Id,DestTable:itm.DestTable } });
   const [newRow, setNewRow] = React.useState<any>(CreateNewJCommonRow(RestoreUtfOffset(props.lastEditedRow?.Date)));
   return (
     <div>
@@ -56,7 +56,7 @@ export function SmartAddForm(props: ISmartAddFormProps) {
               className='form-field'
               disablePortal
               options={opt}
-              renderOption={(props, option) => <li {...props} key={option.id}>{option.label}</li>}
+              renderOption={(props, option) => <li {...props} key={option.id}>{option.label+" ("+option.DestTable+")"}</li>}
               sx={{ width: 300 }}
               renderInput={(params) => <TextField {...params} label="Description" />}
               onChange={(event, value) => {
