@@ -300,10 +300,17 @@ export function MainPage() {
         let result = item.AddRowTime > max.AddRowTime ? item : max;
         return result;
       });
+      if(last_EditedRow){
+        last_EditedRow = {...last_EditedRow};
+      }
     }
     return (
       <div>
-        <SmartAddForm lookupRows={LookupRows} dcItemOptions={DCItemRows} destOptions={DestRows.map((itm: any) => { return { Name: itm } })} handleSubmit={(newRow) => {
+        <SmartAddForm lookupRows={LookupRows} 
+        dcItemOptions={DCItemRows} 
+        destOptions={DestRows.map((itm: any) => { return { Name: itm } })} 
+        lastEditedRow={last_EditedRow}
+        handleSubmit={(newRow) => {
           if (!newRow) {
             setRowSelectionModel([]);
             setMainPageMode(MainPageMode.Regular);
@@ -324,7 +331,6 @@ export function MainPage() {
             })
           setMainPageMode(MainPageMode.Regular);
         }}
-          lastEditedRow={last_EditedRow}
         />
       </div>
     );

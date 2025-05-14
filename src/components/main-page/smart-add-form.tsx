@@ -1,7 +1,7 @@
 import * as React from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import { CreateNewJCommonRow, IDCItems, IJCommonRow, RestoreUtfOffset, StatusEnum, TableNameEnum } from "../../common-types";
+import { CreateNewJCommonRow, IDCItems, IJCommonRow,  StatusEnum, TableNameEnum } from "../../common-types";
 import { CancelTwoTone, SaveTwoTone } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { GeneratePseudoUniqueId } from '../../web-api-wrapper';
@@ -44,7 +44,7 @@ export interface ISmartAddFormProps {
 
 export function SmartAddForm(props: ISmartAddFormProps) {
   const opt = props.lookupRows.map(itm => { return { label: itm.Description, id: itm.Id,DestTable:itm.DestTable } });
-  const [newRow, setNewRow] = React.useState<any>(CreateNewJCommonRow(RestoreUtfOffset(props.lastEditedRow?.Date)));
+  const [newRow, setNewRow] = React.useState<any>(CreateNewJCommonRow(props.lastEditedRow?.Date));
   return (
     <div>
       <Button color="primary" startIcon={<CancelTwoTone />} onClick={() => props.handleSubmit(undefined)}>Cancel</Button>
@@ -108,17 +108,16 @@ export function SmartAddForm(props: ISmartAddFormProps) {
 function InpField(props: IInpField) {
   const caption = props.label ? props.label : props.fldName;
   if (props.type === 'date') {
-    const dateValueStr = props.row[props.fldName].toISOString().substring(0,10);
-    const dateValue = dayjs(dateValueStr);
+    const dateValue = dayjs(props.row[props.fldName]);
     return (
       <DatePicker
         label={caption}
         className='form-field'
         value={dateValue}
-        onChange={(newValue:any) => {
+        onChange={(newValue:any,context:any) => {
           let newrow = { ...props.row };
           if(newValue){
-            newrow[props.fldName] = RestoreUtfOffset(new Date(newValue.toString()));
+            newrow[props.fldName] = new Date(newValue);
             props.onChange(newrow);            
           }
         }} />

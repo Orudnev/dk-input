@@ -86,13 +86,3 @@ export interface IApiResponse{
     eventObj:any;
     invokeMethodResult:any;
 }
-
-export function RestoreUtfOffset(date?:Date):Date{
-    if(!date){
-        date = new Date();
-    }
-    const offsetHours = new Date().getTimezoneOffset()/60;
-    date.setHours(date.getHours() + offsetHours);
-    return date;
-}
-
