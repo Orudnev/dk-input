@@ -50,6 +50,14 @@ export function GetTotalsWithJcommon():Promise<IAppScriptResponse<IApiResponse>>
     });
 }
 
+export function Commit():Promise<IAppScriptResponse<IApiResponse>>{
+    return axios({
+        url:webApiBaseUrl, 
+        method:'GET',
+        params:{method:"commit"}
+    });
+}
+
 export function GeneratePseudoUniqueId(){
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     const timestamp = Date.now().toString(36).toUpperCase().slice(-4); // Берем последние 4 символа от числа в 36-ричной системе
