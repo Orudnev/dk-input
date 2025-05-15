@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ITotals } from '../../common-types';
+import { ITotals, appVersion } from '../../common-types';
 import { WaitIcon } from './toolbar';
 
 function TotalItem(props: { label: string, value: number }): JSX.Element {

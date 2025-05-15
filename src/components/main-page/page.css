@@ -12,6 +12,7 @@
    padding: 10px;
    margin-bottom: 10px;
    width:450px;
+   display: inline-block;
 }
 .totals-item{
     display: inline-block;
@@ -28,4 +29,14 @@
     margin-left: 5px;
     font-weight: bold;
     color: green;
+}
+
+.app-version{
+    display: inline-block;
+    font-family: arial; 
+    font-size: 10px;
+    color: gray;   
+    margin-left: 10px;
+    position: relative;
+    top: -10px;
 }
