@@ -88,6 +88,8 @@ export function MainPage() {
       })
     //newRows[editedRowIndex] = newRow as any;
     AllTablesWrapper.addOrUpdateJCommonRow(newRow as any);
+    setTotalsData(AllTablesWrapper.getTotals());
+
     //setRows(newRows);
 
     return newRow; // Обязательно вернуть строку
@@ -142,13 +144,14 @@ export function MainPage() {
         setMainPageMode(MainPageMode.SmartAddRow);
         break;
       case "Commit":
-        setIsLoading(true);
         setRows([]);
+        setIsLoading(true);
         Commit().then((resp: any) => {
           reloadRows();
         })
         break;
       case "Refresh":
+        setRows([]);
         reloadRows();
         break;
       // case "Cancel":
@@ -219,7 +222,7 @@ export function MainPage() {
     { field: "Sum", headerName: "Sum", width: 100, type: "number", renderCell: RenderByStatus, editable: true }
   ];
   let noRowsComponent: any;
-  if (IsLoading) {
+  if (IsLoading) {    
     noRowsComponent = WaitLoadingRows;
   } else {
     noRowsComponent = NoRows;
