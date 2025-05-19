@@ -78,6 +78,11 @@ export function MainPage() {
     if (newRow.Status == StatusEnum.New) {
       newRow.Status = StatusEnum.NotProcessed;
     }
+    let dcRows = AllTablesWrapper.get().DCItems
+    let selectedDcRow = dcRows.find(itm => itm.Name == newRow.DCItem);
+    if (selectedDcRow) {
+      newRow.Sign = selectedDcRow.Sign;
+    }
     newRow.AddRowTime = new Date();
     //let editedRowIndex = Rows.findIndex((row) => row.Id === newRow.Id);
     //let newRows = [...Rows];
