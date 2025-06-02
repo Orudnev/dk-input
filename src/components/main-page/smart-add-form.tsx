@@ -76,6 +76,7 @@ export function SmartAddForm(props: ISmartAddFormProps) {
               }}
             />
           </FormControl>
+          <InpField fldName="Description" type='text' onChange={setNewRow} row={newRow} label='Description' />
           <InpField fldName="Sum" type='number' onChange={setNewRow} row={newRow} label='Sum' />
           <ComboBox
             fldName="DestTable" label="Destination table"

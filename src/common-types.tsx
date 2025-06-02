@@ -1,6 +1,6 @@
 import { GeneratePseudoUniqueId } from "./web-api-wrapper";
 
-export const appVersion = "1.0.2";
+export const appVersion = "1.0.3";
 
 export enum TableNameEnum {
     None = "",
@@ -245,3 +245,6 @@ export interface IApiResponse {
     eventObj: any;
     invokeMethodResult: any;
 }
+
+
+

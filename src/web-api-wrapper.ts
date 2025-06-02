@@ -50,6 +50,14 @@ export function GetTotalsWithJcommon():Promise<IAppScriptResponse<IApiResponse>>
     });
 }
 
+/**
+ * Commits the current changes to the server.
+ * 
+ * Sends a GET request to the web API to execute the "commit" method.
+ * 
+ * @returns A promise that resolves to an IAppScriptResponse containing an IApiResponse.
+ */
+
 export function Commit():Promise<IAppScriptResponse<IApiResponse>>{
     return axios({
         url:webApiBaseUrl, 
