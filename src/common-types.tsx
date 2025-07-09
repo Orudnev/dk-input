@@ -96,6 +96,44 @@ class AllTablesWrapperClass {
         return result;
     }
 
+    getLookupRowFromAllTables(): IJCommonRow[] {
+        const allTblContent = this.get();        
+        let allTblResult:IJCommonRow[] = [];
+        const getLookupRows = (destTable: TableNameEnum) => {
+            const table:IAccountRow[] = (allTblContent as any)[destTable];
+            const result:IJCommonRow[] = [];
+            table.forEach((row: IAccountRow) => {
+                if(row.Description.toLocaleLowerCase()=="лепешки")
+                {
+                    let s = 1;
+                } 
+                const alreadyAdded = result.find(lrow=>lrow.Description.toLowerCase() == row.Description.toLowerCase());               
+                if(alreadyAdded){
+                    return;
+                }
+                let newRow:IJCommonRow = {
+                    Id: GeneratePseudoUniqueId(),
+                    Date: new Date(),
+                    DestTable: destTable,
+                    DCItem: row.DCItem,
+                    Description: row.Description,
+                    Dest: row.Dest,
+                    Sum: row.Sum,
+                    Sign: row.Sign,
+                    AddRowTime: new Date(),
+                    Status: StatusEnum.Lookup
+                }
+                result.push(newRow);                    
+            });
+            return result;
+        }        
+        allTblResult = allTblResult.concat(getLookupRows(TableNameEnum.BnBish));
+        allTblResult = allTblResult.concat(getLookupRows(TableNameEnum.BnMb));
+        allTblResult = allTblResult.concat(getLookupRows(TableNameEnum.BnSok));
+        allTblResult = allTblResult.concat(getLookupRows(TableNameEnum.Nal));
+        return allTblResult;
+    }   
+
     getTotals(): ITotals {
         let calcTotals = (rows: IAccountRow[], tableName: string) => {
             let accTotals = rows.reduce((acc, row) => {

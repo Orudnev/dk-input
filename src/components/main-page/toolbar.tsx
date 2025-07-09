@@ -42,6 +42,7 @@ export function EditToolbar(props: GridSlotProps['toolbar']) {
 
   const addBtn = props.mainPageMode === MainPageMode.Regular && <Button color="primary" startIcon={<AddIcon />} onClick={handleAddClick}>Add</Button>;
   const addSmartBtn = props.mainPageMode === MainPageMode.Regular && <Button color="primary" startIcon={<AddIcon />} onClick={() => props.handleToolbarCmd("SmartAdd")}>Smart Add</Button>;
+  const addLookup = props.mainPageMode === MainPageMode.Regular && <Button color="primary" startIcon={<AddIcon />} onClick={() => props.handleToolbarCmd("AddLookup")}>Lookup Add</Button>;
   const selectBtn = props.mainPageMode === MainPageMode.SelectRows 
                     ?  <Button color="primary" startIcon={<CheckBoxOutlined />} onClick={() => handleSelectClick(false)}>
                             Select
@@ -59,6 +60,7 @@ export function EditToolbar(props: GridSlotProps['toolbar']) {
     <GridToolbarContainer>
       {addBtn}      
       {addSmartBtn}
+      {addLookup}
       {selectBtn}      
       {deleteBtn}
       {toLookupBtn}

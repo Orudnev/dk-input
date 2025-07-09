@@ -22,7 +22,8 @@ import { IAppSettings } from '../../Reducers/app';
 export enum MainPageMode {
   Regular,
   SelectRows,
-  SmartAddRow
+  SmartAddRow,
+  LookupAddRow
 }
 
 
@@ -62,11 +63,13 @@ export function MainPage() {
   };
   useEffect(() => {
     if (AllTablesWrapper.hasValue()) {
+      //загрузка из локального хранилища
       setRows(AllTablesWrapper.getRegularRows());
       setTotalsData(AllTablesWrapper.getTotals());
       setLookuprows(AllTablesWrapper.getLookupRows());
       return;
     }
+    //загрузка с облака
     reloadRows();
   }, []);
   const handleEditClick = (id: GridRowId) => () => {
@@ -147,6 +150,9 @@ export function MainPage() {
         break;
       case "SmartAdd":
         setMainPageMode(MainPageMode.SmartAddRow);
+        break;
+      case "AddLookup":
+        setMainPageMode(MainPageMode.LookupAddRow);  
         break;
       case "Commit":
         setRows([]);
@@ -232,10 +238,23 @@ export function MainPage() {
   } else {
     noRowsComponent = NoRows;
   }
-  if (mainPageMode === MainPageMode.SmartAddRow) {
+  const getLookupRows = () => {
+    if(mainPageMode === MainPageMode.SmartAddRow){
+      return LookupRows;
+    } else {
+      if (AllTablesWrapper.hasValue()) {
+        let allLookupRows = AllTablesWrapper.getLookupRowFromAllTables();
+        return allLookupRows; 
+      } else {
+        return [];
+      }     
+    }
+  }
+
+  if (mainPageMode === MainPageMode.SmartAddRow || mainPageMode === MainPageMode.LookupAddRow) {
     return (
       <div>
-        <SmartAddForm lookupRows={LookupRows}
+        <SmartAddForm lookupRows={getLookupRows()}
           dcItemOptions={AllTablesWrapper.get().DCItems}
           destOptions={AllTablesWrapper.get().Dest.map((itm: any) => { return { Name: itm } })}
           lastEditedRow={AllTablesWrapper.getLastEditedRow()}
