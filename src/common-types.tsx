@@ -1,6 +1,7 @@
+import { all } from "axios";
 import { GeneratePseudoUniqueId } from "./web-api-wrapper";
 
-export const appVersion = "1.0.4";
+export const appVersion = "1.0.5";
 
 export enum TableNameEnum {
     None = "",
@@ -153,6 +154,10 @@ class AllTablesWrapperClass {
             BnSok: calcTotals(allTblContent.BnSok, "BnSok"),
             Nal: calcTotals(allTblContent.Nal, "Nal")
         };
+        //корректировка итогов с учетом внутренних переводов
+        currJcRows.filter(row=>row.DCItem === 'Внутр.перевод').forEach(row=>{
+           (result as any)[row.Dest] += row.Sum; 
+        });
         return result;
     }
     convertArrayToJCommonRows(rows: any[]): IJCommonRow[] {
@@ -264,7 +269,7 @@ export function CreateNewJCommonRow(date?: Date): IJCommonRow {
     if (!date) {
         date = new Date();
     }
-    return { Id: GeneratePseudoUniqueId(), Date: date, DCItem: "", DestTable: TableNameEnum.None, Description: "", Dest: "", Sum: 0, Sign: -1, AddRowTime: new Date(), Status: StatusEnum.New };
+    return { Id: GeneratePseudoUniqueId(), Date: date, DCItem: "", DestTable: TableNameEnum.None, Description: "", Dest: "", Sum: 0, Sign: -1, AddRowTime: new Date(), Status: StatusEnum.NotProcessed };
 }
 export interface IDCItems {
     Name: string;

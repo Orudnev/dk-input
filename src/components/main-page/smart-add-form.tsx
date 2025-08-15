@@ -42,15 +42,19 @@ export interface ISmartAddFormProps {
   lastEditedRow?:IJCommonRow;
 }
 
+type TSmartAddFormMode = "None"|"Transfer";
+
 export function SmartAddForm(props: ISmartAddFormProps) {
   const opt = props.lookupRows.map(itm => { return { label: itm.Description, id: itm.Id,DestTable:itm.DestTable } });
   const [newRow, setNewRow] = React.useState<any>(CreateNewJCommonRow(props.lastEditedRow?.Date));
+  const [mode, setMode] = React.useState<TSmartAddFormMode>("None");
   return (
     <div>
       <Button color="primary" startIcon={<CancelTwoTone />} onClick={() => props.handleSubmit(undefined)}>Cancel</Button>
       <Button color="primary" startIcon={<SaveTwoTone />} onClick={() => props.handleSubmit(newRow)}>Save</Button>
       <Box style={{ marginTop: '10px', width: 500, border: '2px solid lightgray', borderRadius: '10px', padding: '10px' }}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
+          {mode == "None" &&
           <FormControl>
             <Autocomplete
               className='form-field'
@@ -76,6 +80,7 @@ export function SmartAddForm(props: ISmartAddFormProps) {
               }}
             />
           </FormControl>
+          }
           <InpField fldName="Description" type='text' onChange={setNewRow} row={newRow} label='Description' />
           <InpField fldName="Sum" type='number' onChange={setNewRow} row={newRow} label='Sum' />
           <ComboBox
@@ -91,14 +96,33 @@ export function SmartAddForm(props: ISmartAddFormProps) {
             fldName="DCItem"
             row={newRow}
             style={{ width: 140 }}
-            onChange={setNewRow} options={props.dcItemOptions.map(itm => itm.Name)}
+            onChange={(row) => {
+              if(row.DCItem == 'Внутр.перевод'){
+                setMode("Transfer");
+              }
+              setNewRow(row);
+            }} 
+            options={props.dcItemOptions.map(itm => itm.Name)}
           />
-          <ComboBox
-            fldName="Dest"
-            row={newRow}
-            style={{ width: 140 }}
-            onChange={setNewRow} options={props.destOptions.map(itm => itm.Name)}
-          />
+          {mode == 'None' &&
+            <ComboBox
+              fldName="Dest"
+              row={newRow}
+              style={{ width: 140 }}
+              onChange={setNewRow} options={props.destOptions.map(itm => itm.Name)}
+            />
+          }
+          {mode == 'Transfer' &&
+            <ComboBox
+              fldName="Dest"
+              row={newRow}
+              style={{ width: 140 }}
+              onChange={(row)=>{
+                row.Description = `${row.DestTable} => ${row.Dest}`;
+                setNewRow(row);
+              }} options={[TableNameEnum.BnBish, TableNameEnum.BnSok, TableNameEnum.BnMb, TableNameEnum.Nal].filter(itm=>itm!=newRow.DestTable)}
+            />
+          }
         </LocalizationProvider>
       </Box>
     </div>

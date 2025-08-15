@@ -1,7 +1,7 @@
 import axios from "axios";
 import { IApiResponse, IAppScriptResponse, ITotals, TableNameEnum } from "./common-types";
 
-const webApiBaseUrl = 'https://script.google.com/macros/s/AKfycby9Zid3uvljDBCC9iwC-d5htTZKRw5kt0A-UhSRMhNUUi7GDZM15pQPm2gqvewap4BRsw/exec';
+const webApiBaseUrl = 'https://script.google.com/macros/s/AKfycbycXaWAxQudPSajd4K3-G3DNjxUA2jf89scARoU8obsf5sIW1qPKcODEFikNIuXAWK8pg/exec';
 
 
 export function GetAllTablesContent():Promise<IAppScriptResponse<any>>{
