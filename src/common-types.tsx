@@ -1,5 +1,6 @@
 import { all } from "axios";
 import { GeneratePseudoUniqueId } from "./web-api-wrapper";
+import { RiceBowl } from "@mui/icons-material";
 
 export const appVersion = "1.0.5";
 
@@ -155,7 +156,7 @@ class AllTablesWrapperClass {
             Nal: calcTotals(allTblContent.Nal, "Nal")
         };
         //корректировка итогов с учетом внутренних переводов
-        currJcRows.filter(row=>row.DCItem === 'Внутр.перевод').forEach(row=>{
+        currJcRows.filter(row=>row.DCItem === 'Внутр.перевод' && row.Status < StatusEnum.InProcess).forEach(row=>{
            (result as any)[row.Dest] += row.Sum; 
         });
         return result;
